@@ -30,7 +30,7 @@ batch_size = 64
 D_epoch = 3
 clip_value = 0.05
 
-def sigmoid(x): return 1 / (1 + np.exp(-x))
+def sigmoid(x): return 1 / (1 + np.exp(-x) + 1e-8)  # plus 1e-8 to prevent exploding gradients
 def leaky_relu(x, alpha=0.2): return np.maximum(alpha * x, x)
 def leaky_relu_deriv(x, alpha=0.2): return np.where(x > 0, 1, alpha)
 
@@ -78,7 +78,7 @@ G_losses = []
 for epoch in range(epochs):
     for _ in range(D_epoch):
         idx = np.random.choice(train_images.shape[1], batch_size, replace=False)
-        real_images = train_images[:, idx]  # get a batch of real images
+        real_images = train_images[:, idx]  # get a batch of real images (64 images per batch)
         z = np.random.randn(input_size, batch_size)  # random noise for generator
         fake_images, _, _, _ = generator(z)
 
@@ -142,7 +142,7 @@ for epoch in range(epochs):
         D_W1 -= D_lr * dD_W1
         D_b1 -= D_lr * dD_b1
 
-        # clip weight to satisfy Lipschitz continuity
+        # clip weight to satisfy Lipschitz continuity (1-Lipschitz)
         D_W1 = np.clip(D_W1, -clip_value, clip_value)
         D_W2 = np.clip(D_W2, -clip_value, clip_value)
         D_W3 = np.clip(D_W3, -clip_value, clip_value)
@@ -207,7 +207,7 @@ for epoch in range(epochs):
     D_losses.append(D_loss)
     G_losses.append(G_loss)
 
-    if epoch % 500 == 0:
+    if epoch % 500 == 0:  # show generated images every 500 epoches
         print(f"Epoch {epoch}: D_loss = {D_loss:.4f}, G_loss = {G_loss:.4f}")
         plt.figure(figsize=(15, 5))
         for i in range(3):
@@ -219,7 +219,7 @@ for epoch in range(epochs):
             plt.axis('off')
         plt.show()
 
-plt.figure(figsize=(10,5))
+plt.figure(figsize=(10,5))  # create loss graph
 plt.plot(D_losses, label='discriminator loss')
 plt.plot(G_losses, label='generator loss')
 plt.xlabel('epoch')

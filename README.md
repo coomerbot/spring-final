@@ -1,6 +1,8 @@
 # spring-final
 ## EE243A spring 2025: final  
 在 Google Colab 環境中直接貼上程式碼即可運行模型，建議使用 Colab 內建的 GPU 運行。預設訓練集是整個 MNIST dataset，因此模型會隨機生成數字 0~9 的圖像。  
+  
+## 備注
 將程式碼中的這一行：
 ```py
 train_images = [img.numpy().reshape(-1) for img, _ in train_data]
